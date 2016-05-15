@@ -26,9 +26,23 @@ Makefile*
 *build-*
 
 # QtCreator
+*.cbp
+CMakeLists.txt.user
 
 *.autosave
 
 #QtCtreator Qml
 *.qmlproject.user
 *.qmlproject.user.*
+/build/
+
+# CMake
+/CMakeCache.txt
+/cmake_install.cmake
+/CMakeFiles/
+Makefile
+
+
+#Netbeans
+/nbproject/
+/compile_commands.json
