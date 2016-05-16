@@ -10,8 +10,10 @@
 #include "Logger.h"
 #include "Utility.h"
 
+#include "audiolibrarymodel.h"
 #include "formatsmodel.h"
 #include "participantmodel.h"
+#include "audiodevicemodel.h"
 
 namespace Ui {
 class MainWindow;
@@ -33,10 +35,20 @@ private:
     std::unique_ptr<ohmcomm::OHMComm> ohmComm;
     std::wstringstream logStream;
     
-    void initData();
+    void initSetupView();
+    void initConnectionView();
+    void initLogView();
     
-    FormatsModel formatsModel;
-    ParticipantModel participantsModel;
+    std::unique_ptr<AudioLibraryModel> libraryModel;
+    std::unique_ptr<AudioDeviceModel> inputDeviceModel;
+    std::unique_ptr<AudioDeviceModel> outputDeviceModel;
+    std::unique_ptr<FormatsModel> formatsModel;
+    std::unique_ptr<ParticipantModel> participantsModel;
+    
+private Q_SLOTS:
+    void connectRemote(bool clicked);
+    void clearLog(bool clicked);
+    void updateParticipantInfo(uint32_t participantSSRC);
 };
 
 #endif // MAINWINDOW_H

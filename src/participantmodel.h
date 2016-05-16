@@ -31,6 +31,12 @@ public:
     void onRemoteConnected(const unsigned int ssrc, const std::string& address, const unsigned short port) override;
     void onRemoteRemoved(const unsigned int ssrc) override;
     
+Q_SIGNALS:
+    void participantSelected(uint32_t ssrc);
+
+public Q_SLOTS:
+    void fireParticipantSelected(const QModelIndex& current, const QModelIndex& previous);
+    
 private:
     
     QModelIndex toModelIndex(const unsigned int ssrc) const;

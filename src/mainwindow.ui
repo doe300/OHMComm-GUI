@@ -37,7 +37,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="setupTab">
      <attribute name="title">
@@ -49,52 +49,115 @@
         <x>0</x>
         <y>0</y>
         <width>400</width>
-        <height>400</height>
+        <height>200</height>
        </rect>
       </property>
-      <property name="title">
-       <string>User</string>
+      <property name="autoFillBackground">
+       <bool>false</bool>
       </property>
-      <widget class="QWidget" name="formLayoutWidget_2">
+      <property name="title">
+       <string>Local</string>
+      </property>
+      <widget class="QLabel" name="label_5">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>30</y>
-         <width>381</width>
-         <height>361</height>
+         <y>20</y>
+         <width>100</width>
+         <height>32</height>
         </rect>
        </property>
-       <layout class="QFormLayout" name="formLayout_2">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>User Name:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="userNameLineEdit"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Host Name:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="hostNameLineEdit"/>
-        </item>
-       </layout>
+       <property name="text">
+        <string>User Name:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="userNameLineEdit">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>20</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_6">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Host Name:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="hostNameLineEdit">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>60</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_11">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>100</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>SIP Port:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="localSIPPortLineEdit">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>100</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_12">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>140</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Data Port:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="localDataPortLineEdit">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>140</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
       </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_4">
       <property name="geometry">
        <rect>
-        <x>400</x>
-        <y>0</y>
+        <x>0</x>
+        <y>200</y>
         <width>400</width>
-        <height>400</height>
+        <height>200</height>
        </rect>
       </property>
       <property name="title">
@@ -106,95 +169,245 @@
       <property name="flat">
        <bool>false</bool>
       </property>
-      <widget class="QWidget" name="formLayoutWidget">
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <widget class="QLabel" name="label">
        <property name="geometry">
         <rect>
-         <x>18</x>
-         <y>28</y>
-         <width>371</width>
-         <height>371</height>
+         <x>10</x>
+         <y>20</y>
+         <width>100</width>
+         <height>32</height>
         </rect>
        </property>
-       <layout class="QFormLayout" name="formLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>IP-Address:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="addressLineEdit"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Port:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="portLineEdit"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Codecs:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QListView" name="formatsListView">
-          <property name="selectionMode">
-           <enum>QAbstractItemView::MultiSelection</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QPushButton" name="connectButton">
-          <property name="text">
-           <string>Connect!</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <property name="text">
+        <string>IP-Address:</string>
+       </property>
       </widget>
+      <widget class="QLineEdit" name="addressLineEdit">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>20</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>SIP Port:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="remotePortLineEdit">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>60</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>0</y>
+        <width>400</width>
+        <height>400</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Audio</string>
+      </property>
+      <widget class="QLabel" name="label_10">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Input Device:</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="inputAudioDeviceComboBox">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>60</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_13">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>100</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Output Device:</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="outputAudioDeviceComboBox">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>100</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_14">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>140</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>DTX:</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="dtxCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>140</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>Discontinued Transmission</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_15">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>180</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>FEC:</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="fecCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>180</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>Forward Error Correction</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_3">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>220</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Codecs:</string>
+       </property>
+      </widget>
+      <widget class="QListView" name="formatsListView">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>220</y>
+         <width>200</width>
+         <height>160</height>
+        </rect>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::MultiSelection</enum>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_16">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Audio Library:</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="audioLibraryComboBox">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>20</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="connectButton">
+      <property name="geometry">
+       <rect>
+        <x>660</x>
+        <y>450</y>
+        <width>100</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Connect!</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="connectionTab">
      <attribute name="title">
       <string>Connection</string>
      </attribute>
-     <widget class="QWidget" name="gridLayoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>70</y>
-        <width>791</width>
-        <height>511</height>
-       </rect>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Participants:</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QTableView" name="participantsTableView"/>
-       </item>
-      </layout>
-     </widget>
      <widget class="QLabel" name="label_7">
       <property name="geometry">
        <rect>
-        <x>16</x>
-        <y>20</y>
+        <x>380</x>
+        <y>460</y>
         <width>411</width>
         <height>20</height>
        </rect>
@@ -206,14 +419,224 @@
      <widget class="QLabel" name="label_8">
       <property name="geometry">
        <rect>
-        <x>130</x>
-        <y>50</y>
+        <x>360</x>
+        <y>440</y>
         <width>501</width>
         <height>20</height>
        </rect>
       </property>
       <property name="text">
        <string>Duration, Quality, Members, Code, Bitrate, ...</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_5">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>400</width>
+        <height>500</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Participants</string>
+      </property>
+      <widget class="QTableView" name="participantsTableView">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>380</width>
+         <height>190</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_18">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>220</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Jitter:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_20">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>260</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Packages:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_21">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>300</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Data:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="participantJitterField">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>220</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Last network jitter</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="participantPackagesField">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>260</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Total/Lost Packages</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="participantDataField">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>300</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Total Data / Data Rate</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_4">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>340</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>User:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_19">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>380</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Address:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_23">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>420</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Other:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="participantUserField">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>340</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Remote user name</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="participantAddressField">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>380</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Remote Host / IP Address</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="participantInfoField">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>420</y>
+         <width>200</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Remote Note / Tool</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_6">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>0</y>
+        <width>380</width>
+        <height>300</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Quality</string>
       </property>
      </widget>
     </widget>
@@ -231,7 +654,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="clearLogButton">
       <property name="geometry">
        <rect>
         <x>10</x>

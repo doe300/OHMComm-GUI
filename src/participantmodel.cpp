@@ -1,9 +1,13 @@
+#include <QTableView>
+
 #include "participantmodel.h"
 
 ParticipantModel::ParticipantModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
     ohmcomm::rtp::ParticipantDatabase::registerListener(*this);
+    
+    connect(((QTableView*)parent)->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(fireParticipantSelected(const QModelIndex&, const QModelIndex&)));
 }
 
 ParticipantModel::~ParticipantModel()
@@ -90,4 +94,9 @@ QModelIndex ParticipantModel::toModelIndex(const unsigned int ssrc) const
 unsigned int ParticipantModel::toSSRC(const QModelIndex& index) const
 {
     
+}
+
+void ParticipantModel::fireParticipantSelected(const QModelIndex& current, const QModelIndex& previous)
+{
+    participantSelected(toSSRC(current));
 }
