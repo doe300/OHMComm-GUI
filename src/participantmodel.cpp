@@ -1,13 +1,13 @@
 #include <QTableView>
-
 #include "participantmodel.h"
 
-ParticipantModel::ParticipantModel(QObject *parent)
-    : QAbstractTableModel(parent)
+#include <QListView>
+
+ParticipantModel::ParticipantModel(QObject *parent): QAbstractListModel(parent)
 {
     ohmcomm::rtp::ParticipantDatabase::registerListener(*this);
     
-    connect(((QTableView*)parent)->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(fireParticipantSelected(const QModelIndex&, const QModelIndex&)));
+    connect(((QListView*)parent)->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(fireParticipantSelected(const QModelIndex&, const QModelIndex&)));
 }
 
 ParticipantModel::~ParticipantModel()
@@ -15,22 +15,9 @@ ParticipantModel::~ParticipantModel()
     ohmcomm::rtp::ParticipantDatabase::unregisterListener(*this);
 }
 
-QVariant ParticipantModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    // FIXME: Implement me!
-}
-
 int ParticipantModel::rowCount(const QModelIndex &parent) const
 {
     return ohmcomm::rtp::ParticipantDatabase::getNumberOfRemotes();
-}
-
-int ParticipantModel::columnCount(const QModelIndex &parent) const
-{
-    if (!parent.isValid())
-        return 0;
-
-    // FIXME: Implement me!
 }
 
 QVariant ParticipantModel::data(const QModelIndex &index, int role) const
@@ -68,8 +55,8 @@ bool ParticipantModel::removeRows(int row, int count, const QModelIndex& parent)
 {
     beginRemoveRows(parent, row, row + count);
     endRemoveRows();
+    return true;
 }
-
 
 void ParticipantModel::onRemoteAdded(const unsigned int ssrc)
 {
@@ -88,12 +75,30 @@ void ParticipantModel::onRemoteRemoved(const unsigned int ssrc)
 
 QModelIndex ParticipantModel::toModelIndex(const unsigned int ssrc) const
 {
-    
+    const auto& remotes = ohmcomm::rtp::ParticipantDatabase::getAllRemoteParticipants();
+    unsigned int ind = 0;
+    auto it = remotes.begin();
+    while(it != remotes.end())
+    {
+        if((*it).first == ssrc)
+            return index(ind);
+        ++ind;
+    }
+    return QModelIndex();
 }
 
 unsigned int ParticipantModel::toSSRC(const QModelIndex& index) const
 {
-    
+    const auto& remotes = ohmcomm::rtp::ParticipantDatabase::getAllRemoteParticipants();
+    int ind = 0;
+    auto it = remotes.begin();
+    while(it != remotes.end())
+    {
+        if(ind == index.row())
+            return (*it).first;
+        ++ind;
+    }
+    return UINT_MAX;
 }
 
 void ParticipantModel::fireParticipantSelected(const QModelIndex& current, const QModelIndex& previous)

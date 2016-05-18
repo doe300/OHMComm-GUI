@@ -40,6 +40,9 @@
      <number>0</number>
     </property>
     <widget class="QWidget" name="setupTab">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <attribute name="title">
       <string>Configuration</string>
      </attribute>
@@ -398,37 +401,24 @@
        <string>Connect!</string>
       </property>
      </widget>
+     <widget class="QLabel" name="errorMessageField">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>380</y>
+        <width>300</width>
+        <height>60</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="connectionTab">
      <attribute name="title">
       <string>Connection</string>
      </attribute>
-     <widget class="QLabel" name="label_7">
-      <property name="geometry">
-       <rect>
-        <x>380</x>
-        <y>460</y>
-        <width>411</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>TODO: More info about runnign sessin</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_8">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>440</y>
-        <width>501</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Duration, Quality, Members, Code, Bitrate, ...</string>
-      </property>
-     </widget>
      <widget class="QGroupBox" name="groupBox_5">
       <property name="geometry">
        <rect>
@@ -441,16 +431,6 @@
       <property name="title">
        <string>Participants</string>
       </property>
-      <widget class="QTableView" name="participantsTableView">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>380</width>
-         <height>190</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_18">
        <property name="geometry">
         <rect>
@@ -623,6 +603,16 @@
        </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QListView" name="participantsListView">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>340</width>
+         <height>190</height>
+        </rect>
        </property>
       </widget>
      </widget>

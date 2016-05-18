@@ -2,12 +2,14 @@
 #include "moc_mainwindow.cpp"
 #include "ui_mainwindow.h"
 
+#include "Parameters.h"
+#include "sip/SIPConfiguration.h"
 #include "rtp/RTCPHeader.h"
 #include "rtp/ParticipantDatabase.h"
 #include "rtp/RTCPData.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), ui(new Ui::MainWindow), ohmComm(nullptr)
+    QMainWindow(parent), ui(new Ui::MainWindow), config(nullptr), ohmComm(nullptr), portValidator(0, UINT16_MAX)
 {
     ui->setupUi(this);
     
@@ -16,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     inputDeviceModel.reset(new AudioDeviceModel(true, ui->inputAudioDeviceComboBox));
     outputDeviceModel.reset(new AudioDeviceModel(false, ui->outputAudioDeviceComboBox));
     formatsModel.reset(new FormatsModel(ui->formatsListView));
-    participantsModel.reset(new ParticipantModel(ui->participantsTableView));
+    participantsModel.reset(new ParticipantModel(ui->participantsListView));
     
     initSetupView();
     initConnectionView();
@@ -36,10 +38,13 @@ void MainWindow::initSetupView()
     ui->userNameLineEdit->setText(QString(userName.data()));
     ui->hostNameLineEdit->setText(QString(deviceName.data()));
     ui->localSIPPortLineEdit->setText(QString::number(5060));
+    ui->localSIPPortLineEdit->setValidator(&portValidator);
     ui->localDataPortLineEdit->setText(QString::number(ohmcomm::DEFAULT_NETWORK_PORT));
+    ui->localDataPortLineEdit->setValidator(&portValidator);
     
     //remote
     ui->remotePortLineEdit->setText(QString::number(5060));
+    ui->remotePortLineEdit->setValidator(&portValidator);
     
     //audio
     ui->audioLibraryComboBox->setModel(libraryModel.get());
@@ -51,38 +56,40 @@ void MainWindow::initSetupView()
     connect(ui->audioLibraryComboBox, SIGNAL(currentIndexChanged(QString)), inputDeviceModel.get(), SLOT(onUpdateLibrary(QString)));
     connect(ui->audioLibraryComboBox, SIGNAL(currentIndexChanged(QString)), outputDeviceModel.get(), SLOT(onUpdateLibrary(QString)));
     
+    ui->errorMessageField->setStyleSheet("QLabel { color: red; }");
     //other
     ohmcomm::Logger::LOGGER.reset(this);
-    connect(ui->connectButton, SIGNAL(clicked(bool)), this, SLOT(connectRemote(bool)));
+    connect(ui->connectButton, SIGNAL(clicked()), this, SLOT(connectRemote()));
+    
+    connect(this, SIGNAL(appendLog(QString)), ui->logView, SLOT(append(QString)));
 }
 
 void MainWindow::initConnectionView()
 {
-    ui->participantsTableView->setModel(participantsModel.get());
+    ui->participantsListView->setModel(participantsModel.get());
     connect(participantsModel.get(), SIGNAL(participantSelected(uint32_t)), this, SLOT(updateParticipantInfo(uint32_t)));
 }
 
 void MainWindow::initLogView()
 {
-    connect(ui->clearLogButton, SIGNAL(clicked(bool)), this, SLOT(clearLog(bool)));
+    connect(ui->clearLogButton, SIGNAL(clicked()), this, SLOT(clearLog()));
 }
-
 
 std::wostream& MainWindow::write(const LogLevel level)
 {
     switch(level)
     {
         case ohmcomm::Logger::DEBUG:
-            logStream << "[D]"; 
+            logStream << "<font color='gray'>"; 
             break;
         case ohmcomm::Logger::INFO:
-            logStream << "[I]"; 
+            logStream << "<font color='black'>"; 
             break;
         case ohmcomm::Logger::WARNING:
-            logStream << "[W]"; 
+            logStream << "<font color='orange'>"; 
             break;
         case ohmcomm::Logger::ERROR:
-            logStream << "[E]"; 
+            logStream << "<font color='red'>"; 
             break;
     }
     return logStream;
@@ -90,24 +97,100 @@ std::wostream& MainWindow::write(const LogLevel level)
 
 std::wostream& MainWindow::end(std::wostream& stream)
 {
+    stream << "</font>" << '\0' << std::endl;
     std::wstring data = dynamic_cast<std::wstringstream&>(stream).str();
-    ui->logView->append(QString::fromWCharArray(data.data()));
-    dynamic_cast<std::wstringstream&>(stream).str((wchar_t*)"");
-    return logStream;
+    appendLog(QString::fromStdWString(data));
+    stream.clear();
+    dynamic_cast<std::wstringstream&>(stream).str(std::wstring());
+    return stream;
 }
 
-void MainWindow::connectRemote(bool clicked)
+void MainWindow::connectRemote()
 {
-    if(!clicked)return;
-    //TODO log selected config
-    //TODO try to establish connection
-    //TODO change to participants-tab
+    //make sure, all required fields are set
+    if(ui->userNameLineEdit->text().isEmpty())
+    {
+        ui->errorMessageField->setText("Username can't be empty!");
+        return;
+    }
+    if(ui->hostNameLineEdit->text().isEmpty())
+    {
+        ui->errorMessageField->setText("Hostname can't be empty!");
+        return;
+    }
+    if(ui->localSIPPortLineEdit->text().isEmpty())
+    {
+        ui->errorMessageField->setText("SIP port can't be empty!");
+        return;
+    }
+    if(ui->localDataPortLineEdit->text().isEmpty())
+    {
+        ui->errorMessageField->setText("Data port can't be empty!");
+        return;
+    }
+    if(ui->addressLineEdit->text().isEmpty())
+    {
+        ui->errorMessageField->setText("Remote address can't be empty!");
+        return;
+    }
+    if(ui->remotePortLineEdit->text().isEmpty())
+    {
+        ui->errorMessageField->setText("Remote port can't be empty!");
+        return;
+    }
+    if(!ui->formatsListView->selectionModel()->hasSelection())
+    {
+        ui->errorMessageField->setText("At least a single codec must be selected!");
+        return;
+    }
+    
+    //log selected config
+    ui->logView->append("\nUsing configuration:");
+    ui->logView->append(QString("User '%1', host '%2'").arg(ui->userNameLineEdit->text()).arg(ui->hostNameLineEdit->text()));
+    ui->logView->append(QString("Local SIP port %1, local data port %2, remote address '%3', remote SIP port %4").
+        arg(ui->localSIPPortLineEdit->text()).arg(ui->localDataPortLineEdit->text()).arg(ui->addressLineEdit->text()).arg(ui->remotePortLineEdit->text()));
+    ui->logView->append(QString("Audio library '%1', input device '%2', output device '%3', DTX %4, FEC %5, codecs: %6").
+        arg(ui->audioLibraryComboBox->currentText()).arg(ui->inputAudioDeviceComboBox->currentText()).arg(ui->outputAudioDeviceComboBox->currentText()).
+        arg((ui->dtxCheckBox->isChecked() ? "enabled" : "disabled")).arg((ui->fecCheckBox->isChecked() ? "enabled" : "disabled")).
+        arg(ui->formatsListView->selectionModel()->selectedIndexes().size()));
+    
+    //write configuration mode
+    ohmcomm::NetworkConfiguration sipConfig{};
+    sipConfig.localPort = ui->localSIPPortLineEdit->text().toUShort();
+    sipConfig.remoteIPAddress = ohmcomm::Utility::getAddressForHostName(ui->addressLineEdit->text().toStdString());
+    sipConfig.remotePort = ui->remotePortLineEdit->text().toUShort();
+    ohmcomm::Parameters params({}, {});
+    params.setParameter(ohmcomm::Parameters::AUDIO_HANDLER, ui->audioLibraryComboBox->currentText().toStdString());
+    params.setParameter(ohmcomm::Parameters::INPUT_DEVICE, std::to_string(ui->inputAudioDeviceComboBox->currentIndex()));
+    params.setParameter(ohmcomm::Parameters::OUTPUT_DEVICE, std::to_string(ui->outputAudioDeviceComboBox->currentIndex()));
+    params.setParameter(ohmcomm::Parameters::REMOTE_ADDRESS, sipConfig.remoteIPAddress);
+    params.setParameter(ohmcomm::Parameters::LOCAL_PORT, ui->localDataPortLineEdit->text().toStdString());
+    
+    params.setParameter(ohmcomm::Parameters::ENABLE_DTX, (ui->dtxCheckBox->isChecked() ? "1" : "0"));
+    params.setParameter(ohmcomm::Parameters::ENABLE_FEC, (ui->fecCheckBox->isChecked() ? "1" : "0"));
+    
+    params.setParameter(ohmcomm::Parameters::SDES_CNAME, ui->hostNameLineEdit->text().toStdString());
+    params.setParameter(ohmcomm::Parameters::SDES_NAME, ui->hostNameLineEdit->text().toStdString());
+    
+    config.reset(new ohmcomm::sip::SIPConfiguration(params, sipConfig));
+    
+    //try to establish connection
+    ohmComm.reset(new ohmcomm::OHMComm(config.get()));
+    if(!ohmComm->isConfigurationDone(true))
+    {
+        ohmcomm::error("GUI") << "Failed to configure OHMComm!" << ohmcomm::endl;
+    }
+    ohmComm->startAudioThreads();
+    
+    //switch to participants-tab
     ui->tabWidget->setCurrentIndex(1);
+    
+    //disable all configuration until disconnect
+    ui->setupTab->setEnabled(false);
 }
 
-void MainWindow::clearLog(bool clicked)
+void MainWindow::clearLog()
 {
-    if(!clicked)return;
     ui->logView->clear();
 }
 

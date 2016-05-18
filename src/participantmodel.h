@@ -5,7 +5,7 @@
 
 #include "rtp/ParticipantDatabase.h"
 
-class ParticipantModel : public QAbstractTableModel, private ohmcomm::rtp::ParticipantListener
+class ParticipantModel : public QAbstractListModel, private ohmcomm::rtp::ParticipantListener
 {
     Q_OBJECT
 
@@ -14,12 +14,8 @@ public:
     
     ~ParticipantModel();
 
-    // Header:
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-
     // Basic functionality:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     

@@ -5,7 +5,9 @@
 #include <sstream>
 
 #include <QMainWindow>
+#include <QIntValidator>
 
+#include "config/ConfigurationMode.h"
 #include "OHMComm.h"
 #include "Logger.h"
 #include "Utility.h"
@@ -30,10 +32,15 @@ public:
     std::wostream& write(const LogLevel level) override;
     std::wostream& end(std::wostream& stream) override;
     
+Q_SIGNALS:
+    void appendLog(QString string);
+    
 private:
     Ui::MainWindow *ui;
+    std::shared_ptr<ohmcomm::ConfigurationMode> config;
     std::unique_ptr<ohmcomm::OHMComm> ohmComm;
     std::wstringstream logStream;
+    const QIntValidator portValidator;
     
     void initSetupView();
     void initConnectionView();
@@ -46,8 +53,8 @@ private:
     std::unique_ptr<ParticipantModel> participantsModel;
     
 private Q_SLOTS:
-    void connectRemote(bool clicked);
-    void clearLog(bool clicked);
+    void connectRemote();
+    void clearLog();
     void updateParticipantInfo(uint32_t participantSSRC);
 };
 
