@@ -7,7 +7,9 @@ ParticipantModel::ParticipantModel(QObject *parent): QAbstractListModel(parent)
 {
     ohmcomm::rtp::ParticipantDatabase::registerListener(*this);
     
-    connect(((QListView*)parent)->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(fireParticipantSelected(const QModelIndex&, const QModelIndex&)));
+    connect(this, SIGNAL(onRemoteAdded(unsigned int)), this, SLOT(handleNewParticipant(unsigned int)));
+    connect(this, SIGNAL(onRemoteRemoved(unsigned int)), this, SLOT(handleRemoveParticipant(unsigned int)));
+    connect(this, SIGNAL(remoteConnected(unsigned int)), this, SLOT(handleNewParticipant(unsigned int)));
 }
 
 ParticipantModel::~ParticipantModel()
@@ -24,14 +26,14 @@ QVariant ParticipantModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
+    
+    const auto& remote = ohmcomm::rtp::ParticipantDatabase::getAllRemoteParticipants().find(toSSRC(index));
 
     if(role == Qt::DisplayRole)
     {
-        
-    }
-    if(role == Qt::ToolTipRole)
-    {
-        
+        //if(remote.rtcpData.get() != nullptr)
+        //TODO show display name
+        return QVariant((*remote).first);
     }
     return QVariant();
 }
@@ -58,19 +60,9 @@ bool ParticipantModel::removeRows(int row, int count, const QModelIndex& parent)
     return true;
 }
 
-void ParticipantModel::onRemoteAdded(const unsigned int ssrc)
-{
-    insertRow(0);
-}
-
 void ParticipantModel::onRemoteConnected(const unsigned int ssrc, const std::string& address, const unsigned short port)
 {
-    dataChanged(toModelIndex(ssrc), toModelIndex(ssrc));
-}
-
-void ParticipantModel::onRemoteRemoved(const unsigned int ssrc)
-{
-    removeRow(toModelIndex(ssrc).row());
+    remoteConnected(ssrc);
 }
 
 QModelIndex ParticipantModel::toModelIndex(const unsigned int ssrc) const
@@ -104,4 +96,19 @@ unsigned int ParticipantModel::toSSRC(const QModelIndex& index) const
 void ParticipantModel::fireParticipantSelected(const QModelIndex& current, const QModelIndex& previous)
 {
     participantSelected(toSSRC(current));
+}
+
+void ParticipantModel::handleNewParticipant(const unsigned int ssrc)
+{
+    insertRow(0);
+}
+
+void ParticipantModel::handleRemoteConnected(const unsigned int ssrc)
+{
+    dataChanged(toModelIndex(ssrc), toModelIndex(ssrc));
+}
+
+void ParticipantModel::handleRemoveParticipant(const unsigned int ssrc)
+{
+    removeRow(toModelIndex(ssrc).row());
 }

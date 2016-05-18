@@ -34,8 +34,13 @@ public:
     
 Q_SIGNALS:
     void appendLog(QString string);
+
+public Q_SLOTS:
+    void shutdownCommunication();
     
 private:
+    uint32_t lastSSRC;
+    QTimer updateTimer;
     Ui::MainWindow *ui;
     std::shared_ptr<ohmcomm::ConfigurationMode> config;
     std::unique_ptr<ohmcomm::OHMComm> ohmComm;
@@ -56,6 +61,7 @@ private Q_SLOTS:
     void connectRemote();
     void clearLog();
     void updateParticipantInfo(uint32_t participantSSRC);
+    void updateParticipantDetails();
 };
 
 #endif // MAINWINDOW_H

@@ -9,7 +9,7 @@
 #include "rtp/RTCPData.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), ui(new Ui::MainWindow), config(nullptr), ohmComm(nullptr), portValidator(0, UINT16_MAX)
+    QMainWindow(parent), updateTimer(parent), ui(new Ui::MainWindow), config(nullptr), ohmComm(nullptr), portValidator(0, UINT16_MAX)
 {
     ui->setupUi(this);
     
@@ -23,6 +23,10 @@ MainWindow::MainWindow(QWidget *parent) :
     initSetupView();
     initConnectionView();
     initLogView();
+    
+    //update participant details every second
+    connect(&updateTimer, SIGNAL(timeout()), this, SLOT(updateParticipantDetails()));
+    updateTimer.start(1000);
 }    
 
 MainWindow::~MainWindow()
@@ -60,6 +64,7 @@ void MainWindow::initSetupView()
     //other
     ohmcomm::Logger::LOGGER.reset(this);
     connect(ui->connectButton, SIGNAL(clicked()), this, SLOT(connectRemote()));
+    connect(ui->disconnectButton, SIGNAL(clicked()), this, SLOT(shutdownCommunication()));
     
     connect(this, SIGNAL(appendLog(QString)), ui->logView, SLOT(append(QString)));
 }
@@ -103,6 +108,20 @@ std::wostream& MainWindow::end(std::wostream& stream)
     stream.clear();
     dynamic_cast<std::wstringstream&>(stream).str(std::wstring());
     return stream;
+}
+
+void MainWindow::shutdownCommunication()
+{
+    if(ohmComm.get() != nullptr)
+    {
+        ui->participantsListView->selectionModel()->clearSelection();
+        if(ohmComm->isRunning())
+        {
+            ohmComm->stopAudioThreads();
+        }
+        ohmComm.reset(nullptr);
+        ui->setupTab->setEnabled(true);
+    }
 }
 
 void MainWindow::connectRemote()
@@ -182,6 +201,7 @@ void MainWindow::connectRemote()
     }
     ohmComm->startAudioThreads();
     
+    connect(ui->participantsListView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), participantsModel.get(), SLOT(fireParticipantSelected(const QModelIndex&, const QModelIndex&)));
     //switch to participants-tab
     ui->tabWidget->setCurrentIndex(1);
     
@@ -206,6 +226,7 @@ static std::string getSourceDescription(const ohmcomm::rtp::RTCPData* data, cons
 
 void MainWindow::updateParticipantInfo(uint32_t participantSSRC)
 {
+    lastSSRC = participantSSRC;
     const auto remoteIt = ohmcomm::rtp::ParticipantDatabase::getAllRemoteParticipants().find(participantSSRC);
 
     ui->participantJitterField->setText(QString("%1 ms").arg((*remoteIt).second.interarrivalJitter, 0, 'f', 3));
@@ -222,5 +243,17 @@ void MainWindow::updateParticipantInfo(uint32_t participantSSRC)
         ui->participantUserField->setText("-");
         ui->participantAddressField->setText("-");
         ui->participantInfoField->setText("-");
+    }
+}
+
+void MainWindow::updateParticipantDetails()
+{
+    if(ui->participantsListView->selectionModel() != nullptr)
+    {
+        const QModelIndexList selected = ui->participantsListView->selectionModel()->selectedIndexes();
+        if(!selected.empty())
+        {
+            updateParticipantInfo(lastSSRC);
+        }
     }
 }
