@@ -1,7 +1,8 @@
-#include <QTableView>
 #include "participantmodel.h"
 
 #include <QListView>
+
+#include "rtp/RTCPData.h"
 
 ParticipantModel::ParticipantModel(QObject *parent): QAbstractListModel(parent)
 {
@@ -31,9 +32,11 @@ QVariant ParticipantModel::data(const QModelIndex &index, int role) const
 
     if(role == Qt::DisplayRole)
     {
-        //if(remote.rtcpData.get() != nullptr)
-        //TODO show display name
-        return QVariant((*remote).first);
+        if((*remote).second.rtcpData.get() != nullptr)
+        {
+            return QVariant(QString((*(*remote).second.rtcpData)[ohmcomm::rtp::RTCP_SOURCE_NAME].data()));
+        }
+        return QVariant(QString("%1").arg((*remote).first, 16));
     }
     return QVariant();
 }

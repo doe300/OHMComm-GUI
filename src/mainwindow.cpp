@@ -4,9 +4,9 @@
 
 #include "Parameters.h"
 #include "sip/SIPConfiguration.h"
-#include "rtp/RTCPHeader.h"
 #include "rtp/ParticipantDatabase.h"
 #include "rtp/RTCPData.h"
+#include "Statistics.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), updateTimer(parent), ui(new Ui::MainWindow), config(nullptr), ohmComm(nullptr), portValidator(0, UINT16_MAX)
@@ -112,15 +112,22 @@ std::wostream& MainWindow::end(std::wostream& stream)
 
 void MainWindow::shutdownCommunication()
 {
+    //FIXME crashes with floating point error
     if(ohmComm.get() != nullptr)
     {
         ui->participantsListView->selectionModel()->clearSelection();
         if(ohmComm->isRunning())
         {
             ohmComm->stopAudioThreads();
+            //TODO wait until everything is stopped
+            std::stringstream stream;
+            ohmcomm::Statistics::printStatistics(stream);
+            ui->logView->append(QString(stream.str().data()));
+            ohmComm.reset(nullptr);
         }
-        ohmComm.reset(nullptr);
+        ohmcomm::Statistics::resetStatistics();
         ui->setupTab->setEnabled(true);
+        ui->tabWidget->setCurrentIndex(0);
     }
 }
 
@@ -214,16 +221,6 @@ void MainWindow::clearLog()
     ui->logView->clear();
 }
 
-static std::string getSourceDescription(const ohmcomm::rtp::RTCPData* data, const ohmcomm::rtp::RTCPSourceDescriptionType type)
-{
-    for(const ohmcomm::rtp::SourceDescription& sdes : data->sourceDescriptions)
-    {
-        if(sdes.type == type)
-            return sdes.value;
-    }
-    return "";
-}
-
 void MainWindow::updateParticipantInfo(uint32_t participantSSRC)
 {
     lastSSRC = participantSSRC;
@@ -232,11 +229,12 @@ void MainWindow::updateParticipantInfo(uint32_t participantSSRC)
     ui->participantJitterField->setText(QString("%1 ms").arg((*remoteIt).second.interarrivalJitter, 0, 'f', 3));
     ui->participantPackagesField->setText(QString("%1 (%2 lost)").arg((*remoteIt).second.totalPackages).arg((*remoteIt).second.packagesLost));
     ui->participantDataField->setText(QString("%1 Bytes total").arg((*remoteIt).second.totalBytes));
+    //TODO human-readable form + data rate
     if((*remoteIt).second.rtcpData.get() != nullptr)
     {
-        ui->participantUserField->setText(QString(getSourceDescription((*remoteIt).second.rtcpData.get(), ohmcomm::rtp::RTCP_SOURCE_NAME).data()));
-        ui->participantAddressField->setText(QString(getSourceDescription((*remoteIt).second.rtcpData.get(), ohmcomm::rtp::RTCP_SOURCE_CNAME).data()));
-        ui->participantInfoField->setText(QString(getSourceDescription((*remoteIt).second.rtcpData.get(), ohmcomm::rtp::RTCP_SOURCE_TOOL).data()));
+        ui->participantUserField->setText(QString((*(*remoteIt).second.rtcpData)[ohmcomm::rtp::RTCP_SOURCE_NAME].data()));
+        ui->participantAddressField->setText(QString((*(*remoteIt).second.rtcpData)[ohmcomm::rtp::RTCP_SOURCE_CNAME].data()));
+        ui->participantInfoField->setText(QString((*(*remoteIt).second.rtcpData)[ohmcomm::rtp::RTCP_SOURCE_TOOL].data()));
     }
     else
     {
