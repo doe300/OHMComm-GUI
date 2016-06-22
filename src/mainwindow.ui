@@ -413,6 +413,9 @@
       <property name="text">
        <string/>
       </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="connectionTab">
@@ -435,7 +438,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>220</y>
+         <y>260</y>
          <width>100</width>
          <height>32</height>
         </rect>
@@ -448,7 +451,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>260</y>
+         <y>300</y>
          <width>100</width>
          <height>32</height>
         </rect>
@@ -461,7 +464,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>300</y>
+         <y>340</y>
          <width>100</width>
          <height>32</height>
         </rect>
@@ -474,8 +477,8 @@
        <property name="geometry">
         <rect>
          <x>120</x>
-         <y>220</y>
-         <width>200</width>
+         <y>260</y>
+         <width>220</width>
          <height>32</height>
         </rect>
        </property>
@@ -490,8 +493,8 @@
        <property name="geometry">
         <rect>
          <x>120</x>
-         <y>260</y>
-         <width>200</width>
+         <y>300</y>
+         <width>220</width>
          <height>32</height>
         </rect>
        </property>
@@ -506,8 +509,8 @@
        <property name="geometry">
         <rect>
          <x>120</x>
-         <y>300</y>
-         <width>200</width>
+         <y>340</y>
+         <width>220</width>
          <height>32</height>
         </rect>
        </property>
@@ -522,7 +525,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>340</y>
+         <y>380</y>
          <width>100</width>
          <height>32</height>
         </rect>
@@ -535,7 +538,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>380</y>
+         <y>420</y>
          <width>100</width>
          <height>32</height>
         </rect>
@@ -548,7 +551,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>420</y>
+         <y>460</y>
          <width>100</width>
          <height>32</height>
         </rect>
@@ -561,8 +564,8 @@
        <property name="geometry">
         <rect>
          <x>120</x>
-         <y>340</y>
-         <width>200</width>
+         <y>380</y>
+         <width>220</width>
          <height>32</height>
         </rect>
        </property>
@@ -577,8 +580,8 @@
        <property name="geometry">
         <rect>
          <x>120</x>
-         <y>380</y>
-         <width>200</width>
+         <y>420</y>
+         <width>220</width>
          <height>32</height>
         </rect>
        </property>
@@ -593,8 +596,8 @@
        <property name="geometry">
         <rect>
          <x>120</x>
-         <y>420</y>
-         <width>200</width>
+         <y>460</y>
+         <width>220</width>
          <height>32</height>
         </rect>
        </property>
@@ -613,6 +616,35 @@
          <width>340</width>
          <height>190</height>
         </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_22">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>220</y>
+         <width>100</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Duration:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="participantDurationField">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>220</y>
+         <width>220</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Session duration</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
        </property>
       </widget>
      </widget>

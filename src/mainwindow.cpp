@@ -27,7 +27,10 @@ MainWindow::MainWindow(QWidget *parent) :
     //update participant details every second
     connect(&updateTimer, SIGNAL(timeout()), this, SLOT(updateParticipantDetails()));
     updateTimer.start(1000);
-}    
+}
+
+//FIXME crashes on exit (on destruction of Logger) since this window is the logger and is destroyed before
+//-> move logger out of here!
 
 MainWindow::~MainWindow()
 {
@@ -205,8 +208,21 @@ void MainWindow::connectRemote()
     if(!ohmComm->isConfigurationDone(true))
     {
         ohmcomm::error("GUI") << "Failed to configure OHMComm!" << ohmcomm::endl;
+        ohmComm.reset();
+        ui->errorMessageField->setText("Error configuring OHMComm, see the log for details!");
+        return;
     }
-    ohmComm->startAudioThreads();
+    try
+    {
+        ohmComm->startAudioThreads();
+    }
+    catch(const std::exception& err)
+    {
+        ohmcomm::error("GUI") << err.what() << ohmcomm::endl;
+        ohmComm.reset();
+        ui->errorMessageField->setText("Error starting OHMComm, see the log for details!");
+        return;
+    }
     
     connect(ui->participantsListView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), participantsModel.get(), SLOT(fireParticipantSelected(const QModelIndex&, const QModelIndex&)));
     //switch to participants-tab
@@ -225,11 +241,17 @@ void MainWindow::updateParticipantInfo(uint32_t participantSSRC)
 {
     lastSSRC = participantSSRC;
     const auto remoteIt = ohmcomm::rtp::ParticipantDatabase::getAllRemoteParticipants().find(participantSSRC);
+    
+    const auto duration = std::chrono::steady_clock::now() - (*remoteIt).second.firstPackageReceived;
 
+    ui->participantDurationField->setText(QString("%2 s (%1 ms)").
+            arg(std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()).
+            arg(std::chrono::duration_cast<std::chrono::seconds>(duration).count()));
     ui->participantJitterField->setText(QString("%1 ms").arg((*remoteIt).second.interarrivalJitter, 0, 'f', 3));
     ui->participantPackagesField->setText(QString("%1 (%2 lost)").arg((*remoteIt).second.totalPackages).arg((*remoteIt).second.packagesLost));
-    ui->participantDataField->setText(QString("%1 Bytes total").arg((*remoteIt).second.totalBytes));
-    //TODO human-readable form + data rate
+    ui->participantDataField->setText(QString("%2/s (%1/total)").
+            arg(QString::fromStdString(ohmcomm::Utility::prettifyByteSize((*remoteIt).second.totalBytes))).
+            arg(QString::fromStdString(ohmcomm::Utility::prettifyByteSize((*remoteIt).second.totalBytes / std::chrono::duration_cast<std::chrono::seconds>(duration).count()))));
     if((*remoteIt).second.rtcpData.get() != nullptr)
     {
         ui->participantUserField->setText(QString((*(*remoteIt).second.rtcpData)[ohmcomm::rtp::RTCP_SOURCE_NAME].data()));
@@ -242,6 +264,8 @@ void MainWindow::updateParticipantInfo(uint32_t participantSSRC)
         ui->participantAddressField->setText("-");
         ui->participantInfoField->setText("-");
     }
+    
+    //TODO display format, sample rate, audio-config, ...
 }
 
 void MainWindow::updateParticipantDetails()
