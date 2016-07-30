@@ -7,7 +7,6 @@
 #include <QMainWindow>
 #include <QIntValidator>
 
-#include "config/ConfigurationMode.h"
 #include "OHMComm.h"
 #include "Logger.h"
 #include "Utility.h"
@@ -42,7 +41,6 @@ private:
     uint32_t lastSSRC;
     QTimer updateTimer;
     Ui::MainWindow *ui;
-    std::shared_ptr<ohmcomm::ConfigurationMode> config;
     std::unique_ptr<ohmcomm::OHMComm> ohmComm;
     std::wstringstream logStream;
     const QIntValidator portValidator;

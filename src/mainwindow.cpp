@@ -9,7 +9,7 @@
 #include "Statistics.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), updateTimer(parent), ui(new Ui::MainWindow), config(nullptr), ohmComm(nullptr), portValidator(0, UINT16_MAX)
+    QMainWindow(parent), updateTimer(parent), ui(new Ui::MainWindow), ohmComm(nullptr), portValidator(0, UINT16_MAX)
 {
     ui->setupUi(this);
     
@@ -115,7 +115,6 @@ std::wostream& MainWindow::end(std::wostream& stream)
 
 void MainWindow::shutdownCommunication()
 {
-    //FIXME crashes with floating point error
     if(ohmComm.get() != nullptr)
     {
         ui->participantsListView->selectionModel()->clearSelection();
@@ -129,8 +128,10 @@ void MainWindow::shutdownCommunication()
             ohmComm.reset(nullptr);
         }
         ohmcomm::Statistics::resetStatistics();
+        //switch back to setup-tab
         ui->setupTab->setEnabled(true);
         ui->tabWidget->setCurrentIndex(0);
+        ui->disconnectButton->setEnabled(false);
     }
 }
 
@@ -198,13 +199,12 @@ void MainWindow::connectRemote()
     params.setParameter(ohmcomm::Parameters::ENABLE_DTX, (ui->dtxCheckBox->isChecked() ? "1" : "0"));
     params.setParameter(ohmcomm::Parameters::ENABLE_FEC, (ui->fecCheckBox->isChecked() ? "1" : "0"));
     
-    params.setParameter(ohmcomm::Parameters::SDES_CNAME, ui->hostNameLineEdit->text().toStdString());
-    params.setParameter(ohmcomm::Parameters::SDES_NAME, ui->hostNameLineEdit->text().toStdString());
-    
-    config.reset(new ohmcomm::sip::SIPConfiguration(params, sipConfig));
+    params.setParameter(ohmcomm::Parameters::USER_LOCAL_DEVICE, ui->hostNameLineEdit->text().toStdString());
+    params.setParameter(ohmcomm::Parameters::USER_NAME, ui->hostNameLineEdit->text().toStdString());
     
     //try to establish connection
-    ohmComm.reset(new ohmcomm::OHMComm(config.get()));
+    std::unique_ptr<ohmcomm::ConfigurationMode> config(new ohmcomm::sip::SIPConfiguration(params, sipConfig));
+    ohmComm.reset(new ohmcomm::OHMComm(config.release()));
     if(!ohmComm->isConfigurationDone(true))
     {
         ohmcomm::error("GUI") << "Failed to configure OHMComm!" << ohmcomm::endl;
@@ -226,6 +226,7 @@ void MainWindow::connectRemote()
     
     connect(ui->participantsListView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), participantsModel.get(), SLOT(fireParticipantSelected(const QModelIndex&, const QModelIndex&)));
     //switch to participants-tab
+    ui->disconnectButton->setEnabled(true);
     ui->tabWidget->setCurrentIndex(1);
     
     //disable all configuration until disconnect
@@ -239,8 +240,18 @@ void MainWindow::clearLog()
 
 void MainWindow::updateParticipantInfo(uint32_t participantSSRC)
 {
+    if(ohmComm.get() == nullptr || !ohmComm->isRunning())
+    {
+        //TODO reset fields
+        return;
+    }
     lastSSRC = participantSSRC;
     const auto remoteIt = ohmcomm::rtp::ParticipantDatabase::getAllRemoteParticipants().find(participantSSRC);
+    if(remoteIt == ohmcomm::rtp::ParticipantDatabase::getAllRemoteParticipants().end())
+    {
+        //TODO reset fields
+        return;
+    }
     
     const auto duration = std::chrono::steady_clock::now() - (*remoteIt).second.firstPackageReceived;
 
@@ -264,8 +275,30 @@ void MainWindow::updateParticipantInfo(uint32_t participantSSRC)
         ui->participantAddressField->setText("-");
         ui->participantInfoField->setText("-");
     }
-    
-    //TODO display format, sample rate, audio-config, ...
+    if((*remoteIt).second.cryptoContext.get() != nullptr)
+    {
+        ui->participantCryptoEnabledBox->setChecked(true);
+        ui->participantSecurityAlgorithmField->setText(QString::fromStdString((*remoteIt).second.cryptoContext->cryptoMode.name));
+    }
+    else
+    {
+        ui->participantCryptoEnabledBox->setChecked(false);
+        ui->participantSecurityAlgorithmField->setText("-");
+    }
+    const ohmcomm::sip::SupportedFormat* format = ohmcomm::sip::SupportedFormats::getFormat((*remoteIt).second.payloadType);
+    if(format != nullptr)
+    {
+        ui->participantEncodingField->setText(QString::fromStdString(format->encoding));
+        ui->participantSampleRateField->setText(QString("%1 kHz").arg(ohmcomm::Utility::prettifyPercentage(format->sampleRate/100000.0)));
+        const std::string numChannels = format->numChannels == 1 ? "mono (1)" : format->numChannels == 2 ? "stereo (2)" : std::to_string(format->numChannels);
+        ui->participantChannelsField->setText(QString::fromStdString(numChannels));
+    }
+    else
+    {
+        ui->participantEncodingField->setText("-");
+        ui->participantSampleRateField->setText("-");
+        ui->participantChannelsField->setText("-");
+    }
 }
 
 void MainWindow::updateParticipantDetails()
