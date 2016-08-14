@@ -2,16 +2,20 @@
 #include "moc_mainwindow.cpp"
 #include "ui_mainwindow.h"
 
+#include <QDesktopServices>
+
 #include "Parameters.h"
 #include "sip/SIPConfiguration.h"
 #include "rtp/ParticipantDatabase.h"
 #include "rtp/RTCPData.h"
 #include "Statistics.h"
+#include "helper.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), updateTimer(parent), ui(new Ui::MainWindow), ohmComm(nullptr), portValidator(0, UINT16_MAX)
 {
     ui->setupUi(this);
+    setWindowTitle(QString("OHMComm GUI %1").arg(QString::fromStdString(ohmcomm::OHMCOMM_VERSION)));
     
     //initialize models, must be after setting up GUI
     libraryModel.reset(new AudioLibraryModel(ui->audioLibraryComboBox));
@@ -23,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     initSetupView();
     initConnectionView();
     initLogView();
+    initStatusBar();
     
     //update participant details every second
     connect(&updateTimer, SIGNAL(timeout()), this, SLOT(updateParticipantDetails()));
@@ -83,6 +88,33 @@ void MainWindow::initLogView()
     connect(ui->clearLogButton, SIGNAL(clicked()), this, SLOT(clearLog()));
 }
 
+void MainWindow::initStatusBar()
+{
+    QLabel* updateLabel = new QLabel(this);
+    const QString latestVersionString = QString::fromStdString(Helper::getLatestVersion());
+    if(QString::fromStdString(ohmcomm::OHMCOMM_VERSION).compare(latestVersionString) != 0)
+    {
+        updateLabel->setText((QString("<a href=\"") + QString::fromStdString(ohmcomm::OHMCOMM_HOMEPAGE) + "/releases/\">") + latestVersionString + " out now!</a>");
+        QObject::connect(updateLabel, SIGNAL(linkActivated(const QString&)), this, SLOT(openLink(const QString&)));
+    }
+    else
+    {
+        updateLabel->setText(QString::fromStdString(ohmcomm::OHMCOMM_VERSION));
+    }
+    statusBar()->addPermanentWidget(updateLabel);
+    
+    QLabel* bugLabel = new QLabel(this);
+    bugLabel->setText((QString("<a href=\"") + QString::fromStdString(ohmcomm::OHMCOMM_HOMEPAGE) + "/issues/\">") + "Found a bug?</a>");
+    QObject::connect(bugLabel, SIGNAL(linkActivated(const QString&)), this, SLOT(openLink(const QString&)));
+    statusBar()->addPermanentWidget(bugLabel);
+    
+    QLabel* homepageLabel = new QLabel(this);
+    homepageLabel->setText((QString("<a href=\"") + QString::fromStdString(ohmcomm::OHMCOMM_HOMEPAGE) + "\">") + "Homepage?</a>");
+    QObject::connect(homepageLabel, SIGNAL(linkActivated(const QString&)), this, SLOT(openLink(const QString&)));
+    statusBar()->addPermanentWidget(homepageLabel);
+}
+
+
 std::wostream& MainWindow::write(const LogLevel level)
 {
     switch(level)
@@ -133,6 +165,12 @@ void MainWindow::shutdownCommunication()
         ui->tabWidget->setCurrentIndex(0);
         ui->disconnectButton->setEnabled(false);
     }
+}
+
+void MainWindow::openLink(const QString& link)
+{
+    ohmcomm::info("GUI") << "Opening URL: " << link.toStdWString() << ohmcomm::endl;
+    QDesktopServices::openUrl(QUrl(link));
 }
 
 void MainWindow::connectRemote()

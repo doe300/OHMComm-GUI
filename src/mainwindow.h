@@ -36,6 +36,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void shutdownCommunication();
+    void openLink(const QString& link);
     
 private:
     uint32_t lastSSRC;
@@ -48,6 +49,7 @@ private:
     void initSetupView();
     void initConnectionView();
     void initLogView();
+    void initStatusBar();
     
     std::unique_ptr<AudioLibraryModel> libraryModel;
     std::unique_ptr<AudioDeviceModel> inputDeviceModel;

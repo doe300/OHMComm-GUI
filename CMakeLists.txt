@@ -49,6 +49,12 @@ endif()
 find_package(Qt5Widgets REQUIRED)
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 
+# RESTless - https://github.com/anuragsoni/restless
+# Include via submodule
+include(cmake/submodules.cmake)
+add_subdirectory(lib/restless build/restless)
+include_directories(lib/restless/include)
+
 ####
 # Main files
 ####

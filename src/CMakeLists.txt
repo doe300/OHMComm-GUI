@@ -13,3 +13,6 @@ target_link_libraries(OHMCommGUI OHMComm)
 
 # Use the Widgets module from Qt 5.
 target_link_libraries(OHMCommGUI Qt5::Widgets)
+
+# Include RESTless API
+target_link_libraries(OHMCommGUI restless)

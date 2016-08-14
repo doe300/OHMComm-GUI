@@ -26,7 +26,6 @@
     <property name="title">
      <string>Log</string>
     </property>
-    <zorder>tabWidget</zorder>
    </widget>
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
