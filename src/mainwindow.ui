@@ -483,10 +483,13 @@
         </rect>
        </property>
        <property name="text">
-        <string>Remote user name</string>
+        <string/>
        </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Remote user name</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="participantAddressField">
@@ -499,10 +502,13 @@
         </rect>
        </property>
        <property name="text">
-        <string>Remote Host / IP Address</string>
+        <string/>
        </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Remote Host / IP Address</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="participantInfoField">
@@ -515,10 +521,13 @@
         </rect>
        </property>
        <property name="text">
-        <string>Remote Note / Tool</string>
+        <string/>
        </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Remote Note / Tool</string>
        </property>
       </widget>
       <widget class="QListView" name="participantsListView">
@@ -554,10 +563,13 @@
         </rect>
        </property>
        <property name="text">
-        <string>Last network jitter</string>
+        <string/>
        </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Last network jitter</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="participantPackagesField">
@@ -570,10 +582,13 @@
         </rect>
        </property>
        <property name="text">
-        <string>Total/Lost Packages</string>
+        <string/>
        </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Total/Lost Packages</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="participantDataField">
@@ -586,10 +601,13 @@
         </rect>
        </property>
        <property name="text">
-        <string>Total Data / Data Rate</string>
+        <string/>
        </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Total Data / Data Rate</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="participantDurationField">
@@ -602,10 +620,13 @@
         </rect>
        </property>
        <property name="text">
-        <string>Session duration</string>
+        <string/>
        </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Session duration</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_18">
@@ -699,10 +720,13 @@
         </rect>
        </property>
        <property name="text">
-        <string>Cryptographic Algorithm</string>
+        <string/>
        </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Cryptographic Algorithm</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_24">
@@ -770,10 +794,13 @@
         </rect>
        </property>
        <property name="text">
-        <string>Sample Rate</string>
+        <string/>
        </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Sample Rate</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_25">
@@ -812,10 +839,13 @@
         </rect>
        </property>
        <property name="text">
-        <string>Audio Format</string>
+        <string/>
        </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Audio Format</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_28">
@@ -841,10 +871,13 @@
         </rect>
        </property>
        <property name="text">
-        <string>Number of Channels</string>
+        <string/>
        </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Number of Channels</string>
        </property>
       </widget>
      </widget>
@@ -909,7 +942,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>26</height>
+     <height>28</height>
     </rect>
    </property>
   </widget>

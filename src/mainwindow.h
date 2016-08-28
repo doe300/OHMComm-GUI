@@ -8,7 +8,6 @@
 #include <QIntValidator>
 
 #include "OHMComm.h"
-#include "Logger.h"
 #include "Utility.h"
 
 #include "audiolibrarymodel.h"
@@ -20,16 +19,13 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow, private ohmcomm::Logger
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    
-    std::wostream& write(const LogLevel level) override;
-    std::wostream& end(std::wostream& stream) override;
     
 Q_SIGNALS:
     void appendLog(QString string);
@@ -43,7 +39,6 @@ private:
     QTimer updateTimer;
     Ui::MainWindow *ui;
     std::unique_ptr<ohmcomm::OHMComm> ohmComm;
-    std::wstringstream logStream;
     const QIntValidator portValidator;
     
     void initSetupView();
@@ -56,6 +51,8 @@ private:
     std::unique_ptr<AudioDeviceModel> outputDeviceModel;
     std::unique_ptr<FormatsModel> formatsModel;
     std::unique_ptr<ParticipantModel> participantsModel;
+    
+    void resetParticipantInfo();
     
 private Q_SLOTS:
     void connectRemote();

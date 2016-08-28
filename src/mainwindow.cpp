@@ -9,6 +9,7 @@
 #include "rtp/ParticipantDatabase.h"
 #include "rtp/RTCPData.h"
 #include "Statistics.h"
+#include "Logger.h"
 #include "helper.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -33,9 +34,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&updateTimer, SIGNAL(timeout()), this, SLOT(updateParticipantDetails()));
     updateTimer.start(1000);
 }
-
-//FIXME crashes on exit (on destruction of Logger) since this window is the logger and is destroyed before
-//-> move logger out of here!
 
 MainWindow::~MainWindow()
 {
@@ -70,7 +68,6 @@ void MainWindow::initSetupView()
     
     ui->errorMessageField->setStyleSheet("QLabel { color: red; }");
     //other
-    ohmcomm::Logger::LOGGER.reset(this);
     connect(ui->connectButton, SIGNAL(clicked()), this, SLOT(connectRemote()));
     connect(ui->disconnectButton, SIGNAL(clicked()), this, SLOT(shutdownCommunication()));
     
@@ -109,40 +106,9 @@ void MainWindow::initStatusBar()
     statusBar()->addPermanentWidget(bugLabel);
     
     QLabel* homepageLabel = new QLabel(this);
-    homepageLabel->setText((QString("<a href=\"") + QString::fromStdString(ohmcomm::OHMCOMM_HOMEPAGE) + "\">") + "Homepage?</a>");
+    homepageLabel->setText((QString("<a href=\"") + QString::fromStdString(ohmcomm::OHMCOMM_HOMEPAGE) + "\">") + "Homepage</a>");
     QObject::connect(homepageLabel, SIGNAL(linkActivated(const QString&)), this, SLOT(openLink(const QString&)));
     statusBar()->addPermanentWidget(homepageLabel);
-}
-
-
-std::wostream& MainWindow::write(const LogLevel level)
-{
-    switch(level)
-    {
-        case ohmcomm::Logger::DEBUG:
-            logStream << "<font color='gray'>"; 
-            break;
-        case ohmcomm::Logger::INFO:
-            logStream << "<font color='black'>"; 
-            break;
-        case ohmcomm::Logger::WARNING:
-            logStream << "<font color='orange'>"; 
-            break;
-        case ohmcomm::Logger::ERROR:
-            logStream << "<font color='red'>"; 
-            break;
-    }
-    return logStream;
-}
-
-std::wostream& MainWindow::end(std::wostream& stream)
-{
-    stream << "</font>" << '\0' << std::endl;
-    std::wstring data = dynamic_cast<std::wstringstream&>(stream).str();
-    appendLog(QString::fromStdWString(data));
-    stream.clear();
-    dynamic_cast<std::wstringstream&>(stream).str(std::wstring());
-    return stream;
 }
 
 void MainWindow::shutdownCommunication()
@@ -280,14 +246,14 @@ void MainWindow::updateParticipantInfo(uint32_t participantSSRC)
 {
     if(ohmComm.get() == nullptr || !ohmComm->isRunning())
     {
-        //TODO reset fields
+        resetParticipantInfo();
         return;
     }
     lastSSRC = participantSSRC;
     const auto remoteIt = ohmcomm::rtp::ParticipantDatabase::getAllRemoteParticipants().find(participantSSRC);
     if(remoteIt == ohmcomm::rtp::ParticipantDatabase::getAllRemoteParticipants().end())
     {
-        //TODO reset fields
+        resetParticipantInfo();
         return;
     }
     
@@ -349,4 +315,23 @@ void MainWindow::updateParticipantDetails()
             updateParticipantInfo(lastSSRC);
         }
     }
+}
+
+void MainWindow::resetParticipantInfo()
+{
+    ui->participantDurationField->clear();
+    ui->participantJitterField->clear();
+    ui->participantPackagesField->clear();
+    ui->participantDataField->clear();
+    
+    ui->participantUserField->clear();
+    ui->participantAddressField->clear();
+    ui->participantInfoField->clear();
+    
+    ui->participantCryptoEnabledBox->setChecked(false);
+    ui->participantSecurityAlgorithmField->clear();
+    
+    ui->participantEncodingField->clear();
+    ui->participantSampleRateField->clear();
+    ui->participantChannelsField->clear();
 }
